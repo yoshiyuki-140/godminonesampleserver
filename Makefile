@@ -19,11 +19,24 @@ post:
 	-H "Content-Type: application/json" \
 	-d '{"task":"Task","is_completed":false}' | jq
 
-create_user:
+register:
 	curl -X POST \
 	localhost:8080/account/register \
 	-H "Content-Type: application/json" \
 	-d '{"name":"kuro","password":"pass"}'
+
+login:
+	curl -X GET \
+	localhost:8080/account/login \
+	-H "Content-Type: application/json" \
+	-d '{"name":"kuro","password":"pass"}'
+
+logout:
+	curl -X POST \
+	localhost:8080/account/logout \
+	-H "Content-Type: application/json" \
+	-d '{"session_id":"999999"}'
+
 
 
 psqllogin:
