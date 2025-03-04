@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yoshiyuki-140/godminonesampleserver/models"
+	"github.com/yoshiyuki-140/godminonesampleserver/cmd/models"
 	"gorm.io/gorm"
 )
 

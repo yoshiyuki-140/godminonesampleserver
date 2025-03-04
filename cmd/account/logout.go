@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yoshiyuki-140/godminonesampleserver/cmd/models"
 	"github.com/yoshiyuki-140/godminonesampleserver/cmd/utils"
-	"github.com/yoshiyuki-140/godminonesampleserver/models"
 	"gorm.io/gorm"
 )
 
