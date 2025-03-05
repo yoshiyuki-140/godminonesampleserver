@@ -5,21 +5,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/yoshiyuki-140/godminonesampleserver/cmd/account"
+	"github.com/yoshiyuki-140/godminonesampleserver/cmd/models"
+	"github.com/yoshiyuki-140/godminonesampleserver/cmd/task"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type Task struct {
-	ID          uint      `gorm:"primary_key"`
-	Task        string    `gorm:"size:255"`
-	IsCompleted bool      `gorm:"default:false"`
-	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	UpdatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-}
 
 func main() {
 
@@ -46,34 +41,58 @@ func main() {
 	}
 
 	// データベースにテーブルを作成
-	db.AutoMigrate(&Task{})
+	db.AutoMigrate(&models.User{}, &models.Task{})
 
 	// Ginエンジンのインスタンスを作成
 	r := gin.Default()
 
-	// ルートURL ("/") に対するGETリクエストをハンドル
+	// テストエントリポイント
 	r.GET("/", func(c *gin.Context) {
-		// JSONレスポンスを返す
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
+		msg := "Hello World"
+		c.JSON(200, gin.H{"message": msg})
+	})
+
+	// register
+	r.POST("/account/register", func(c *gin.Context) {
+		account.Register(c, db)
+	})
+
+	// login
+	r.GET("/account/login", func(c *gin.Context) {
+		account.Login(c, db)
+		log.Println("Hello")
+	})
+
+	// logout
+	r.POST("/account/logout", func(c *gin.Context) {
+		account.Logout(c, db)
+	})
+
+	// 全てのタスク一覧を取得する
+	r.GET("/tasks", func(c *gin.Context) {
+		task.GetAllTasks(c, db)
+	})
+
+	// タスクを一つ取得する
+	r.GET("/tasks/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusNotFound, gin.H{"error": "パスパラメータを読み込めませんでした。\nこのエントリポイントでのパスパラメータは数値にしてください。Example : localhost:8080/tasks/1"})
+			return
+		}
+		task.GetTask(c, db, id)
 	})
 
 	// 新しいタスクを作成するエンドポイント
 	r.POST("/tasks", func(c *gin.Context) {
-		var task Task
-		err := c.ShouldBindJSON(&task)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		db.Create(&task)
-		c.JSON(http.StatusOK, task)
+		task.CreateTask(c, db)
 	})
 
+	/* TODO: タスク更新のハンドラ関数を別ファイルに分割 */
 	// タスクを更新するエンドポイント
 	r.PUT("/tasks/:id", func(c *gin.Context) {
-		var task Task
+		var task models.Task
 		id := c.Param("id")
 
 		if err := db.First(&task, id).Error; err != nil {
@@ -90,9 +109,10 @@ func main() {
 		c.JSON(http.StatusOK, task)
 	})
 
+	/* TODO: タスク削除のハンドラ関数を別ファイルに分割 */
 	// タスクを削除するエンドポイント
 	r.DELETE("/tasks/:id", func(c *gin.Context) {
-		var task Task
+		var task models.Task
 		id := c.Param("id")
 
 		if err := db.First(&task, id).Error; err != nil {
