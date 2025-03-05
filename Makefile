@@ -10,14 +10,9 @@ kill:
 up:
 	docker compose up -d
 
-get:
-	curl localhost:8080
+psqllogin:
+	psql postgres postgres -h localhost -p 5432 # password -> `password`
 
-post:
-	curl -X POST \
-	localhost:8080/tasks \
-	-H "Content-Type: application/json" \
-	-d '{"task":"Task","is_completed":false}' | jq
 
 register:
 	curl -X POST \
@@ -38,6 +33,19 @@ logout:
 	-d '{"session_id":"999999"}'
 
 
+getAllTasks:
+	curl -X GET \
+	localhost:8080/tasks \
+	-H "Content-Type: application/json" | jq
 
-psqllogin:
-	psql postgres postgres -h localhost -p 5432 # password -> `password`
+getTask:
+	curl -X GET \
+	localhost:8080/tasks/1 \
+	-H "Content-Type: application/json" | jq
+
+createTask:
+	curl -X POST \
+	localhost:8080/tasks \
+	-H "Content-Type: application/json" \
+	-d '{ "session_id": "999999","task": { "task": "kuro", "is_completed": false } }' | jq
+
