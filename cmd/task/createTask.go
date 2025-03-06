@@ -37,7 +37,9 @@ func CreateTask(c *gin.Context, db *gorm.DB) {
 	if err = result.Error; err != nil {
 		msg := "セッションIDが無効です"
 		log.Println(msg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": msg})
 		err = fmt.Errorf("%s\n%s\n", msg, err)
+		return
 	}
 
 	// タスク作成
