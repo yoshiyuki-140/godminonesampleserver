@@ -78,7 +78,6 @@ func main() {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			log.Println(err)
-			// TODO: レスポンスを読みやすく修正 -> /tasks/:id PUTみたいな感じ
 			c.JSON(http.StatusNotFound, gin.H{"error": "パスパラメータを読み込めませんでした。\nこのエントリポイントでのパスパラメータは数値にしてください。Example : localhost:8080/tasks/1"})
 			return
 		}
@@ -105,19 +104,19 @@ func main() {
 		task.UpdateTask(c, db, id)
 	})
 
+	/* TODO: タスク削除のハンドラ関数を別ファイルに分割 */
 	// タスクを削除するエンドポイント
 	r.DELETE("/tasks/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			log.Println(err)
-			c.JSON(http.StatusNotFound, gin.H{
-				"error":   "パスパラメータを読み込めませんでした。",
-				"message": "このエントリポイントでのパスパラメータは数値にしてください。",
-				"example": "localhost:8080/tasks/1",
-			})
+		var task models.Task
+		id := c.Param("id")
+
+		if err := db.First(&task, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 			return
 		}
-		task.DeleteTask(c, db, id)
+
+		db.Delete(&task)
+		c.JSON(http.StatusOK, gin.H{"message": "Task deleted"})
 	})
 
 	// 8080ポートでサーバーを起動
