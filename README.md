@@ -8,6 +8,7 @@
 ## Usage
 
 - .envを.env.exampleに沿って準備する
+- シェルで以下を実行
 
 ```bash
 # Postgresql ver 14のコンテナを立ち上げ
