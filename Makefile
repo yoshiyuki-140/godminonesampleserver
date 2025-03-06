@@ -49,3 +49,10 @@ createTask:
 	-H "Content-Type: application/json" \
 	-d '{ "session_id": "999999","task": { "task": "kuro", "is_completed": false } }' | jq
 
+updateTask:
+	curl -X PUT \
+	localhost:8080/tasks/7 \
+	-H "Content-Type: application/json" \
+	-d '{ "session_id": "999999","task": { "task": "kuro", "is_completed": true } }' | jq
+
+
