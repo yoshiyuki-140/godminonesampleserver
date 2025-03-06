@@ -55,4 +55,10 @@ updateTask:
 	-H "Content-Type: application/json" \
 	-d '{ "session_id": "999999","task": { "task": "kuro", "is_completed": true } }' | jq
 
+deleteTask:
+	curl -X DELETE \
+	localhost:8080/tasks/2 \
+	-H "Content-Type: application/json" \
+	-d '{ "session_id": "999999" }' | jq
+
 
