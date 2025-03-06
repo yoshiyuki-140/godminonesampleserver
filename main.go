@@ -89,24 +89,19 @@ func main() {
 		task.CreateTask(c, db)
 	})
 
-	/* TODO: タスク更新のハンドラ関数を別ファイルに分割 */
 	// タスクを更新するエンドポイント
 	r.PUT("/tasks/:id", func(c *gin.Context) {
-		var task models.Task
-		id := c.Param("id")
-
-		if err := db.First(&task, id).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusNotFound, gin.H{
+				"error":   "パスパラメータを読み込めませんでした。",
+				"message": "このエントリポイントでのパスパラメータは数値にしてください。",
+				"example": "localhost:8080/tasks/1",
+			})
 			return
 		}
-
-		if err := c.ShouldBindJSON(&task); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		db.Save(&task)
-		c.JSON(http.StatusOK, task)
+		task.UpdateTask(c, db, id)
 	})
 
 	/* TODO: タスク削除のハンドラ関数を別ファイルに分割 */
