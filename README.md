@@ -3,7 +3,7 @@
 ## 必要なもの
 - docker
 - docker compose
-- Go : 1.26.6 <= version
+- Go : 1.22.1 <= version
 
 ## Usage
 
